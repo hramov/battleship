@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hramov/battleship/pkg/ship"
+	"github.com/hramov/battleship/pkg/utils"
 )
 
 const FIELD_WIDTH = 10
@@ -63,7 +64,7 @@ func (b BattleField) DrawField() {
 }
 
 func (b BattleField) UpdateField(s ship.Ship) BattleField {
-	fmt.Printf("\nХод: %s-%d\n", parser(s.StartX), s.StartY)
+	fmt.Printf("\nХод: %s-%d\n", utils.Parser(s.StartX), s.StartY)
 	for i := 0; i < s.Length; i++ {
 		if s.Direction == 0 {
 			b.enemyField[(s.StartX - 1)][(s.StartY-1)+i] = "X"
@@ -84,41 +85,4 @@ func (b BattleField) ClearField() {
 func (b BattleField) CheckLength(StartX, StartY, Direction int) int {
 
 	return 0
-}
-
-func parser(x int) string {
-	var a string
-	switch x {
-	case 1:
-		a = "A"
-		break
-	case 2:
-		a = "Б"
-		break
-	case 3:
-		a = "В"
-		break
-	case 4:
-		a = "Г"
-		break
-	case 5:
-		a = "Д"
-		break
-	case 6:
-		a = "Е"
-		break
-	case 7:
-		a = "Ж"
-		break
-	case 8:
-		a = "З"
-		break
-	case 9:
-		a = "И"
-		break
-	case 10:
-		a = "К"
-		break
-	}
-	return a
 }
