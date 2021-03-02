@@ -7,7 +7,7 @@ import (
 	"github.com/hramov/battleship/pkg/ship"
 )
 
-func Start() {
+func PlaceShips() {
 
 	//Creating and drawing battlefield
 	b := battlefield.BattleField{}
@@ -17,36 +17,19 @@ func Start() {
 	//Creating and drawing ships
 	var ships []ship.Ship
 
-	s := ship.Ship{}
-	s = s.CreateShip()
+	for i := 0; i < 10; i++ {
+		fmt.Printf("Корабль %d:\n", i+1)
+		s := ship.Ship{}
+		s = s.CreateShip()
 
-	status, err := b.CheckShip(s)
+		_, err := b.CheckShip(s)
 
-	if status {
-		ships = append(ships, s)
-		b = b.UpdateField(s)
-	} else {
-		fmt.Println(err)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			ships = append(ships, s)
+			b = b.UpdateField(s)
+		}
 	}
-
-}
-
-func Turn() {
-
-}
-
-func Hit() {
-
-}
-
-func Destroy() {
-
-}
-
-func IsWon() {
-
-}
-
-func Stop() {
 
 }

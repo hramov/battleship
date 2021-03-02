@@ -5,10 +5,13 @@ import (
 )
 
 type Ship struct {
-	Length    int
-	StartX    int
-	StartY    int
-	Direction int
+	Length     int
+	StartX     int
+	StartY     int
+	Direction  int
+	Hit        bool
+	LivePoints int
+	Live       bool
 }
 
 func (s Ship) CreateShip() Ship {

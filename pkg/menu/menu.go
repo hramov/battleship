@@ -31,7 +31,7 @@ func MainMenu() {
 	fmt.Scanf("%d", &menuChose)
 	switch menuChose {
 	case 1:
-		gameloop.Start()
+		gameloop.PlaceShips()
 		break
 	case 2:
 		fmt.Println("Khramov Sergey")

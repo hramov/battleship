@@ -79,9 +79,9 @@ func (b BattleField) UpdateField(s ship.Ship) BattleField {
 	fmt.Printf("\nХод: %s-%d\n", utils.Parser(s.StartY), s.StartX)
 	for i := 0; i < s.Length; i++ {
 		if s.Direction == 0 {
-			b.enemyField[s.StartY][s.StartX+i] = "X"
+			b.myField[s.StartY][s.StartX+i] = "X"
 		} else if s.Direction == 1 {
-			b.enemyField[s.StartY+i][s.StartX] = "X"
+			b.myField[s.StartY+i][s.StartX] = "X"
 		}
 	}
 	b.DrawField()
@@ -97,11 +97,12 @@ func (b BattleField) ClearField() {
 func (b BattleField) CheckShip(s ship.Ship) (bool, error) {
 
 	errorMessage := "Начальное сообщение"
+	var turnCheck Field = b.myField
 
-	if b.enemyField[s.StartY][s.StartX] == "_" {
+	if turnCheck[s.StartY][s.StartX] == "_" {
 		if s.Direction == 0 {
 			if s.StartY+s.Length < FIELD_HEIGHT {
-				if b.enemyField[s.StartY+s.Length][s.StartX] != "_" {
+				if turnCheck[s.StartY+s.Length][s.StartX] != "_" {
 					errorMessage = "Уперся в *"
 				} else {
 					return true, nil
@@ -111,7 +112,7 @@ func (b BattleField) CheckShip(s ship.Ship) (bool, error) {
 			}
 		} else {
 			if s.StartX+s.Length < FIELD_WIDTH {
-				if b.enemyField[s.StartY][s.StartX+s.Length] != "_" {
+				if turnCheck[s.StartY][s.StartX+s.Length] != "_" {
 					errorMessage = "Уперся в *"
 				} else {
 					return true, nil
