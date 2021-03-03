@@ -141,7 +141,6 @@ func (b BattleField) DrawShot(Player bool, ShotX, ShotY int, Result int) BattleF
 			b.myField[ShotX][ShotY] = "X"
 		}
 	}
-	fmt.Println(b.enemyField)
 	b.DrawField()
 	return b
 }
@@ -206,8 +205,11 @@ func (b BattleField) CheckShot(Player bool, ShotX, ShotY int) error {
 }
 
 func (b BattleField) CheckHit(Player bool, ShotX, ShotY int, ships *[]ship.Ship) error {
-	newShips := *ships
-	var myShips, enemyShips []ship.Ship
+
+	var newShips, myShips, enemyShips []ship.Ship
+
+	newShips = *ships
+
 	for i := 0; i < len(newShips); i++ {
 		if newShips[i].Player == !Player {
 			enemyShips = append(enemyShips, newShips[i])
@@ -215,24 +217,29 @@ func (b BattleField) CheckHit(Player bool, ShotX, ShotY int, ships *[]ship.Ship)
 			myShips = append(myShips, newShips[i])
 		}
 	}
+
 	for i := 0; i < len(enemyShips); i++ {
+
 		for j := 0; j < enemyShips[i].Length; j++ {
 			if enemyShips[i].Direction == 0 {
-				if ShotX == enemyShips[i].StartX+i && ShotY == enemyShips[i].StartY {
+				if ShotX == enemyShips[i].StartX && ShotY == enemyShips[i].StartY+j {
 					enemyShips[i].LivePoints--
 					return nil
 				}
 			} else {
-				if ShotX == enemyShips[i].StartX && ShotY == enemyShips[i].StartY+i {
+				if ShotX == enemyShips[i].StartX+j && ShotY == enemyShips[i].StartY {
 					enemyShips[i].LivePoints--
 					return nil
 				}
 			}
 		}
+
 		if enemyShips[i].LivePoints > 0 {
 			myShips = append(myShips, enemyShips[i])
 		}
+
 	}
+
 	*ships = myShips
 	return fmt.Errorf("%s", "Мимо!")
 }

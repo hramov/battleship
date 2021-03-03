@@ -42,23 +42,15 @@ func PlaceShips(Player bool, ships *[]ship.Ship, b *battlefield.BattleField) {
 }
 
 func Game(Player bool, b *battlefield.BattleField, ships *[]ship.Ship) {
-
 	for {
-
-		fmt.Printf("Играем с %t\n", Player)
-		var ShotX, ShotY int
-		fmt.Println("Введите координаты выстрела! Число:")
-		fmt.Scanf("%d", &ShotX)
-		fmt.Println("Введите координаты выстрела! Буква:")
-		fmt.Scanf("%d", &ShotY)
-
+		ShotX, ShotY := ship.HitShip()
 		err := b.CheckShot(Player, ShotX, ShotY)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-
 		err1 := b.CheckHit(Player, ShotX, ShotY, ships)
+		fmt.Println(ships)
 		if err1 != nil {
 			fmt.Println(err1)
 			*b = b.DrawShot(Player, ShotX, ShotY, 0)
@@ -66,7 +58,32 @@ func Game(Player bool, b *battlefield.BattleField, ships *[]ship.Ship) {
 		} else {
 			fmt.Println("Попал!")
 			*b = b.DrawShot(Player, ShotX, ShotY, 1)
-		}
 
+			result := IsWon(Player, ships)
+			fmt.Println(result)
+			if result {
+				fmt.Printf("Игрок %t победил!\n", Player)
+				break
+			}
+		}
 	}
+}
+
+func IsWon(Player bool, ships *[]ship.Ship) bool {
+	var newShips, myShips, enemyShips []ship.Ship
+
+	newShips = *ships
+
+	for i := 0; i < len(newShips); i++ {
+		if newShips[i].Player == !Player {
+			enemyShips = append(enemyShips, newShips[i])
+		} else {
+			myShips = append(myShips, newShips[i])
+		}
+	}
+
+	if len(enemyShips) == 0 {
+		return true
+	}
+	return false
 }

@@ -33,13 +33,8 @@ func (s Ship) CreateShip(Player bool) Ship {
 func HitShip() (int, int) {
 	var ShotX, ShotY int
 	fmt.Println("Введите координаты выстрела! Число:")
-	fmt.Scanf("%d", ShotX)
+	fmt.Scanf("%d", &ShotX)
 	fmt.Println("Введите координаты выстрела! Буква:")
-	fmt.Scanf("%d", ShotY)
+	fmt.Scanf("%d", &ShotY)
 	return ShotX, ShotY
-}
-
-func DestroyShip(id int) {
-	var ships [][]int
-	ships[id] = nil
 }
