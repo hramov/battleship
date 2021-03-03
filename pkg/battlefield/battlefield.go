@@ -74,13 +74,11 @@ func (b BattleField) DrawField() {
 	}
 }
 
-func (b BattleField) UpdateField(s ship.Ship) BattleField {
-	// fmt.Printf("\nХод: %s-%d\n", utils.Parser(s.StartY), s.StartX)
+func (b BattleField) DrawShip(s ship.Ship) BattleField {
 	for i := 0; i < s.Length; i++ {
 		b.CheckShip(s)
 		if s.Direction == 0 {
-
-			b.myField[s.StartY][s.StartX+i] = "X"
+			b.myField[s.StartY][s.StartX+i] = "O"
 			b.myField[s.StartY+1][s.StartX+i] = "*"
 			b.myField[s.StartY-1][s.StartX+i] = "*"
 			b.myField[s.StartY][s.StartX-1] = "*"
@@ -89,10 +87,8 @@ func (b BattleField) UpdateField(s ship.Ship) BattleField {
 			b.myField[s.StartY-1][s.StartX+s.Length] = "*"
 			b.myField[s.StartY+1][s.StartX-1] = "*"
 			b.myField[s.StartY-1][s.StartX-1] = "*"
-
 		} else if s.Direction == 1 {
-
-			b.myField[s.StartY+i][s.StartX] = "X"
+			b.myField[s.StartY+i][s.StartX] = "O"
 			b.myField[s.StartY+i][s.StartX+1] = "*"
 			b.myField[s.StartY+i][s.StartX-1] = "*"
 			b.myField[s.StartY-1][s.StartX] = "*"
@@ -101,10 +97,19 @@ func (b BattleField) UpdateField(s ship.Ship) BattleField {
 			b.myField[s.StartY+s.Length][s.StartX-1] = "*"
 			b.myField[s.StartY-1][s.StartX+1] = "*"
 			b.myField[s.StartY-1][s.StartX-1] = "*"
-
 		}
 	}
 	b.DrawField()
+	return b
+}
+
+func (b BattleField) DrawShot(ShotX, ShotY int, Result int) BattleField {
+	if Result == 0 {
+		b.enemyField[ShotX][ShotY] = "*"
+	} else {
+		b.enemyField[ShotX][ShotY] = "X"
+	}
+
 	return b
 }
 
@@ -145,4 +150,44 @@ func (b BattleField) CheckShip(s ship.Ship) (bool, error) {
 		errorMessage = "Первое условие"
 	}
 	return false, fmt.Errorf("%s", errorMessage)
+}
+
+func (b BattleField) CheckShot(ShotX, ShotY int) error {
+
+	if b.enemyField[ShotX][ShotY] == "_" {
+		return nil
+	}
+	return fmt.Errorf("%s", "Сюда нельзя стрелять")
+}
+
+func (b BattleField) CheckHit(Player bool, ShotX, ShotY int, ships *[]ship.Ship) error {
+	newShips := *ships
+	var myShips, enemyShips []ship.Ship
+	for i := 0; i < len(newShips); i++ {
+		if newShips[i].Player == !Player {
+			enemyShips = append(enemyShips, newShips[i])
+		} else {
+			myShips = append(myShips, newShips[i])
+		}
+	}
+	for i := 0; i < len(enemyShips); i++ {
+		for j := 0; j < enemyShips[i].Length; j++ {
+			if enemyShips[i].Direction == 0 {
+				if ShotX == enemyShips[i].StartX+i && ShotY == enemyShips[i].StartY {
+					enemyShips[i].LivePoints--
+					return nil
+				}
+			} else {
+				if ShotX == enemyShips[i].StartX && ShotY == enemyShips[i].StartY+i {
+					enemyShips[i].LivePoints--
+					return nil
+				}
+			}
+		}
+		if enemyShips[i].LivePoints > 0 {
+			myShips = append(myShips, enemyShips[i])
+		}
+	}
+	*ships = myShips
+	return fmt.Errorf("%s", "Мимо!")
 }
