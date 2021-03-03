@@ -204,7 +204,9 @@ func (b BattleField) CheckShot(Player bool, ShotX, ShotY int) error {
 	return fmt.Errorf("%s", "Сюда нельзя стрелять")
 }
 
-func (b BattleField) CheckHit(Player bool, ShotX, ShotY int, ships *[]ship.Ship) error {
+func (b BattleField) CheckHit(Player bool, ShotX, ShotY int, ships *[]ship.Ship) bool {
+
+	var result bool = false
 
 	var newShips, myShips, enemyShips []ship.Ship
 
@@ -224,22 +226,23 @@ func (b BattleField) CheckHit(Player bool, ShotX, ShotY int, ships *[]ship.Ship)
 			if enemyShips[i].Direction == 0 {
 				if ShotX == enemyShips[i].StartX && ShotY == enemyShips[i].StartY+j {
 					enemyShips[i].LivePoints--
-					return nil
+					result = true
 				}
 			} else {
 				if ShotX == enemyShips[i].StartX+j && ShotY == enemyShips[i].StartY {
 					enemyShips[i].LivePoints--
-					return nil
+					result = true
 				}
 			}
 		}
 
 		if enemyShips[i].LivePoints > 0 {
 			myShips = append(myShips, enemyShips[i])
+			fmt.Println(myShips)
 		}
 
 	}
 
 	*ships = myShips
-	return fmt.Errorf("%s", "Мимо!")
+	return result
 }

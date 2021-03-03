@@ -50,8 +50,7 @@ func Game(Player bool, b *battlefield.BattleField, ships *[]ship.Ship) {
 			continue
 		}
 		err1 := b.CheckHit(Player, ShotX, ShotY, ships)
-		fmt.Println(ships)
-		if err1 != nil {
+		if err1 == false {
 			fmt.Println(err1)
 			*b = b.DrawShot(Player, ShotX, ShotY, 0)
 			Player = !Player
@@ -71,9 +70,7 @@ func Game(Player bool, b *battlefield.BattleField, ships *[]ship.Ship) {
 
 func IsWon(Player bool, ships *[]ship.Ship) bool {
 	var newShips, myShips, enemyShips []ship.Ship
-
 	newShips = *ships
-
 	for i := 0; i < len(newShips); i++ {
 		if newShips[i].Player == !Player {
 			enemyShips = append(enemyShips, newShips[i])
@@ -81,7 +78,6 @@ func IsWon(Player bool, ships *[]ship.Ship) bool {
 			myShips = append(myShips, newShips[i])
 		}
 	}
-
 	if len(enemyShips) == 0 {
 		return true
 	}
