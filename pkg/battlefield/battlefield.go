@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/hramov/battleship/pkg/ship"
-	"github.com/hramov/battleship/pkg/utils"
 )
 
 const FIELD_WIDTH = 12
@@ -76,12 +75,33 @@ func (b BattleField) DrawField() {
 }
 
 func (b BattleField) UpdateField(s ship.Ship) BattleField {
-	fmt.Printf("\nХод: %s-%d\n", utils.Parser(s.StartY), s.StartX)
+	// fmt.Printf("\nХод: %s-%d\n", utils.Parser(s.StartY), s.StartX)
 	for i := 0; i < s.Length; i++ {
+		b.CheckShip(s)
 		if s.Direction == 0 {
+
 			b.myField[s.StartY][s.StartX+i] = "X"
+			b.myField[s.StartY+1][s.StartX+i] = "*"
+			b.myField[s.StartY-1][s.StartX+i] = "*"
+			b.myField[s.StartY][s.StartX-1] = "*"
+			b.myField[s.StartY][s.StartX+s.Length] = "*"
+			b.myField[s.StartY+1][s.StartX+s.Length] = "*"
+			b.myField[s.StartY-1][s.StartX+s.Length] = "*"
+			b.myField[s.StartY+1][s.StartX-1] = "*"
+			b.myField[s.StartY-1][s.StartX-1] = "*"
+
 		} else if s.Direction == 1 {
+
 			b.myField[s.StartY+i][s.StartX] = "X"
+			b.myField[s.StartY+i][s.StartX+1] = "*"
+			b.myField[s.StartY+i][s.StartX-1] = "*"
+			b.myField[s.StartY-1][s.StartX] = "*"
+			b.myField[s.StartY+s.Length][s.StartX] = "*"
+			b.myField[s.StartY+s.Length][s.StartX+1] = "*"
+			b.myField[s.StartY+s.Length][s.StartX-1] = "*"
+			b.myField[s.StartY-1][s.StartX+1] = "*"
+			b.myField[s.StartY-1][s.StartX-1] = "*"
+
 		}
 	}
 	b.DrawField()
@@ -99,10 +119,10 @@ func (b BattleField) CheckShip(s ship.Ship) (bool, error) {
 	errorMessage := "Начальное сообщение"
 	var turnCheck Field = b.myField
 
-	if turnCheck[s.StartY][s.StartX] == "_" {
+	if turnCheck[s.StartY][s.StartX] == "_" { //В начальной точке нет другого корабля
 		if s.Direction == 0 {
-			if s.StartY+s.Length < FIELD_HEIGHT {
-				if turnCheck[s.StartY+s.Length][s.StartX] != "_" {
+			if s.StartY+s.Length < FIELD_HEIGHT { //Проверка выхода за границы поля
+				if turnCheck[s.StartY+s.Length][s.StartX] != "_" { //Проверка доступности клетки в конечной точке
 					errorMessage = "Уперся в *"
 				} else {
 					return true, nil

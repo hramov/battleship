@@ -29,6 +29,7 @@ func PlaceShips() {
 		} else {
 			ships = append(ships, s)
 			b = b.UpdateField(s)
+			fmt.Println(b)
 		}
 	}
 
