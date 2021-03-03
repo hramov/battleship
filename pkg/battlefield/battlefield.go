@@ -77,39 +77,72 @@ func (b BattleField) DrawField() {
 func (b BattleField) DrawShip(s ship.Ship) BattleField {
 	for i := 0; i < s.Length; i++ {
 		b.CheckShip(s)
-		if s.Direction == 0 {
-			b.myField[s.StartY][s.StartX+i] = "O"
-			b.myField[s.StartY+1][s.StartX+i] = "*"
-			b.myField[s.StartY-1][s.StartX+i] = "*"
-			b.myField[s.StartY][s.StartX-1] = "*"
-			b.myField[s.StartY][s.StartX+s.Length] = "*"
-			b.myField[s.StartY+1][s.StartX+s.Length] = "*"
-			b.myField[s.StartY-1][s.StartX+s.Length] = "*"
-			b.myField[s.StartY+1][s.StartX-1] = "*"
-			b.myField[s.StartY-1][s.StartX-1] = "*"
-		} else if s.Direction == 1 {
-			b.myField[s.StartY+i][s.StartX] = "O"
-			b.myField[s.StartY+i][s.StartX+1] = "*"
-			b.myField[s.StartY+i][s.StartX-1] = "*"
-			b.myField[s.StartY-1][s.StartX] = "*"
-			b.myField[s.StartY+s.Length][s.StartX] = "*"
-			b.myField[s.StartY+s.Length][s.StartX+1] = "*"
-			b.myField[s.StartY+s.Length][s.StartX-1] = "*"
-			b.myField[s.StartY-1][s.StartX+1] = "*"
-			b.myField[s.StartY-1][s.StartX-1] = "*"
+		if s.Player {
+			if s.Direction == 0 {
+				b.myField[s.StartY][s.StartX+i] = "O"
+				b.myField[s.StartY+1][s.StartX+i] = "*"
+				b.myField[s.StartY-1][s.StartX+i] = "*"
+				b.myField[s.StartY][s.StartX-1] = "*"
+				b.myField[s.StartY][s.StartX+s.Length] = "*"
+				b.myField[s.StartY+1][s.StartX+s.Length] = "*"
+				b.myField[s.StartY-1][s.StartX+s.Length] = "*"
+				b.myField[s.StartY+1][s.StartX-1] = "*"
+				b.myField[s.StartY-1][s.StartX-1] = "*"
+			} else if s.Direction == 1 {
+				b.myField[s.StartY+i][s.StartX] = "O"
+				b.myField[s.StartY+i][s.StartX+1] = "*"
+				b.myField[s.StartY+i][s.StartX-1] = "*"
+				b.myField[s.StartY-1][s.StartX] = "*"
+				b.myField[s.StartY+s.Length][s.StartX] = "*"
+				b.myField[s.StartY+s.Length][s.StartX+1] = "*"
+				b.myField[s.StartY+s.Length][s.StartX-1] = "*"
+				b.myField[s.StartY-1][s.StartX+1] = "*"
+				b.myField[s.StartY-1][s.StartX-1] = "*"
+			}
+		} else {
+			if s.Direction == 0 {
+				b.enemyField[s.StartY][s.StartX+i] = "O"
+				b.enemyField[s.StartY+1][s.StartX+i] = "*"
+				b.enemyField[s.StartY-1][s.StartX+i] = "*"
+				b.enemyField[s.StartY][s.StartX-1] = "*"
+				b.enemyField[s.StartY][s.StartX+s.Length] = "*"
+				b.enemyField[s.StartY+1][s.StartX+s.Length] = "*"
+				b.enemyField[s.StartY-1][s.StartX+s.Length] = "*"
+				b.enemyField[s.StartY+1][s.StartX-1] = "*"
+				b.enemyField[s.StartY-1][s.StartX-1] = "*"
+			} else if s.Direction == 1 {
+				b.enemyField[s.StartY+i][s.StartX] = "O"
+				b.enemyField[s.StartY+i][s.StartX+1] = "*"
+				b.enemyField[s.StartY+i][s.StartX-1] = "*"
+				b.enemyField[s.StartY-1][s.StartX] = "*"
+				b.enemyField[s.StartY+s.Length][s.StartX] = "*"
+				b.enemyField[s.StartY+s.Length][s.StartX+1] = "*"
+				b.enemyField[s.StartY+s.Length][s.StartX-1] = "*"
+				b.enemyField[s.StartY-1][s.StartX+1] = "*"
+				b.enemyField[s.StartY-1][s.StartX-1] = "*"
+			}
 		}
 	}
 	b.DrawField()
 	return b
 }
 
-func (b BattleField) DrawShot(ShotX, ShotY int, Result int) BattleField {
-	if Result == 0 {
-		b.enemyField[ShotX][ShotY] = "*"
+func (b BattleField) DrawShot(Player bool, ShotX, ShotY int, Result int) BattleField {
+	if Player {
+		if Result == 0 {
+			b.enemyField[ShotX][ShotY] = "*"
+		} else {
+			b.enemyField[ShotX][ShotY] = "X"
+		}
 	} else {
-		b.enemyField[ShotX][ShotY] = "X"
+		if Result == 0 {
+			b.myField[ShotX][ShotY] = "*"
+		} else {
+			b.myField[ShotX][ShotY] = "X"
+		}
 	}
-
+	fmt.Println(b.enemyField)
+	b.DrawField()
 	return b
 }
 
@@ -122,7 +155,13 @@ func (b BattleField) ClearField() {
 func (b BattleField) CheckShip(s ship.Ship) (bool, error) {
 
 	errorMessage := "Начальное сообщение"
-	var turnCheck Field = b.myField
+	var turnCheck Field
+
+	if s.Player {
+		turnCheck = b.myField
+	} else {
+		turnCheck = b.enemyField
+	}
 
 	if turnCheck[s.StartY][s.StartX] == "_" { //В начальной точке нет другого корабля
 		if s.Direction == 0 {
@@ -152,10 +191,16 @@ func (b BattleField) CheckShip(s ship.Ship) (bool, error) {
 	return false, fmt.Errorf("%s", errorMessage)
 }
 
-func (b BattleField) CheckShot(ShotX, ShotY int) error {
+func (b BattleField) CheckShot(Player bool, ShotX, ShotY int) error {
 
-	if b.enemyField[ShotX][ShotY] == "_" {
-		return nil
+	if Player {
+		if b.enemyField[ShotX][ShotY] == "O" || b.enemyField[ShotX][ShotY] == "*" {
+			return nil
+		}
+	} else {
+		if b.myField[ShotX][ShotY] == "O" || b.myField[ShotX][ShotY] == "*" {
+			return nil
+		}
 	}
 	return fmt.Errorf("%s", "Сюда нельзя стрелять")
 }

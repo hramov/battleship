@@ -25,14 +25,17 @@ func (s Ship) CreateShip(Player bool) Ship {
 	fmt.Scanf("%d", &s.Direction)
 	fmt.Printf("%s ", "Введите длину корабля (1,2,3,4):")
 	fmt.Scanf("%d", &s.Length)
-
+	s.LivePoints = s.Length
+	fmt.Println(s)
 	return s
 }
 
 func HitShip() (int, int) {
-	fmt.Println("Введите координаты выстрела!")
 	var ShotX, ShotY int
-	fmt.Scanf("%d %d", ShotX, ShotY)
+	fmt.Println("Введите координаты выстрела! Число:")
+	fmt.Scanf("%d", ShotX)
+	fmt.Println("Введите координаты выстрела! Буква:")
+	fmt.Scanf("%d", ShotY)
 	return ShotX, ShotY
 }
 

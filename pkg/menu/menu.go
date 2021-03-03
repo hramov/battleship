@@ -24,8 +24,6 @@ func draw(menuItems []string) {
 }
 
 func MainMenu() {
-
-	var Player bool = false
 	menuItems := create()
 	draw(menuItems)
 
@@ -33,7 +31,7 @@ func MainMenu() {
 	fmt.Scanf("%d", &menuChose)
 	switch menuChose {
 	case 1:
-		gameloop.Start(Player)
+		gameloop.Start()
 		break
 	case 2:
 		fmt.Println("Khramov Sergey")
