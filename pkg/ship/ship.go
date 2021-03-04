@@ -5,7 +5,7 @@ import (
 )
 
 type Ship struct {
-	Player     bool
+	Player     string
 	Length     int
 	StartX     int
 	StartY     int
@@ -15,8 +15,13 @@ type Ship struct {
 	Live       bool
 }
 
-func (s Ship) CreateShip(Player bool) Ship {
-	s.Player = Player
+type Shot struct {
+	X int
+	Y int
+}
+
+func (s Ship) CreateShip(PlayerID string) Ship {
+	s.Player = PlayerID
 	fmt.Printf("%s ", "Введите числовую позицию (1-10):")
 	fmt.Scanf("%d", &s.StartY)
 	fmt.Printf("%s ", "Введите буквенную позицию (1-10):")
@@ -30,11 +35,11 @@ func (s Ship) CreateShip(Player bool) Ship {
 	return s
 }
 
-func HitShip() (int, int) {
-	var ShotX, ShotY int
+func HitShip() Shot {
+	var shot Shot
 	fmt.Println("Введите координаты выстрела! Число:")
-	fmt.Scanf("%d", &ShotX)
+	fmt.Scanf("%d", &shot.X)
 	fmt.Println("Введите координаты выстрела! Буква:")
-	fmt.Scanf("%d", &ShotY)
-	return ShotX, ShotY
+	fmt.Scanf("%d", &shot.Y)
+	return shot
 }
