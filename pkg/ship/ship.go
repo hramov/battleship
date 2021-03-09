@@ -5,14 +5,14 @@ import (
 )
 
 type Ship struct {
-	Player     string
-	Length     int
-	StartX     int
-	StartY     int
-	Direction  int
-	Hit        bool
-	LivePoints int
-	Live       bool
+	Player     string `json: "player"`
+	Length     int    `json: "length"`
+	StartX     int    `json: "startX"`
+	StartY     int    `json: "startY"`
+	Direction  int    `json: "direction"`
+	Hit        bool   `json: "hit"`
+	LivePoints int    `json: "livePoints"`
+	Live       bool   `json: "live"`
 }
 
 type Shot struct {
@@ -20,8 +20,8 @@ type Shot struct {
 	Y int
 }
 
-func (s Ship) CreateShip(PlayerID string) Ship {
-	s.Player = PlayerID
+func (s *Ship) CreateShip(ClientID string) Ship {
+	s.Player = ClientID
 	fmt.Printf("%s ", "Введите числовую позицию (1-10):")
 	fmt.Scanf("%d", &s.StartY)
 	fmt.Printf("%s ", "Введите буквенную позицию (1-10):")
@@ -31,8 +31,9 @@ func (s Ship) CreateShip(PlayerID string) Ship {
 	fmt.Printf("%s ", "Введите длину корабля (1,2,3,4):")
 	fmt.Scanf("%d", &s.Length)
 	s.LivePoints = s.Length
-	fmt.Println(s)
-	return s
+	s.Hit = false
+	s.Live = true
+	return *s
 }
 
 func HitShip() Shot {

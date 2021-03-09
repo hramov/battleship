@@ -16,8 +16,9 @@ type BattleField struct {
 }
 
 type Client struct {
-	ID    string
-	Field BattleField
+	ID        string
+	Field     Field
+	ShotField Field
 }
 
 func DrawField(client Client) {
@@ -33,9 +34,9 @@ func DrawField(client Client) {
 		}
 		for j := 1; j < FIELD_WIDTH-1; j++ {
 			if j != FIELD_WIDTH-2 {
-				fmt.Printf("|%s", client.Field.MyField[i][j])
+				fmt.Printf("|%s", client.Field[i][j])
 			} else {
-				fmt.Printf("|%s|", client.Field.MyField[i][j])
+				fmt.Printf("|%s|", client.Field[i][j])
 			}
 		}
 		fmt.Printf("\t\t")
@@ -48,9 +49,9 @@ func DrawField(client Client) {
 		}
 		for j := 1; j < FIELD_HEIGHT-1; j++ {
 			if j != FIELD_HEIGHT-2 {
-				fmt.Printf("|%s", client.Field.EnemyField[i][j])
+				fmt.Printf("|%s", client.ShotField[i][j])
 			} else {
-				fmt.Printf("|%s|", client.Field.EnemyField[i][j])
+				fmt.Printf("|%s|", client.ShotField[i][j])
 			}
 		}
 		fmt.Println()

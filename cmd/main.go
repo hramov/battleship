@@ -1,26 +1,20 @@
 package main
 
-// import (
-// 	// "github.com/hramov/battleship/pkg/menu"
-// 	"github.com/zhouhui8915/go-socket.io-client"
-// )
-
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 
-	bf "github.com/hramov/battleship/pkg/battlefield"
-	"github.com/hramov/battleship/pkg/ship"
-	"github.com/hramov/battleship/pkg/socket"
+	b "github.com/hramov/battleship/pkg/battlefield"
+	ship "github.com/hramov/battleship/pkg/ship"
+	socket "github.com/hramov/battleship/pkg/socket"
 )
 
 func main() {
-
-	client := socket.CreateSocket()
 	var ClientID string
+	var isGame bool = true
+	var player b.Client
+	client := socket.CreateSocket()
 
 	client.On("connection", func() {
 		log.Printf("Успешно подключился к серверу\n")
@@ -31,23 +25,16 @@ func main() {
 	})
 
 	client.On("updateField", func(data []byte) {
-		var client bf.Client
-		json.Unmarshal(data, &client)
-		bf.DrawField(client)
+		fmt.Println("123")
+		json.Unmarshal(data, &player)
+		b.DrawField(player)
 	})
 
-	client.On("placeShips", func() {
-		var ships []ship.Ship
-		i := 0
+	client.On("placeShip", func() {
 		s := ship.Ship{}
-
-		for i < 10 {
-			ships = append(ships, s.CreateShip(ClientID))
-			i++
-		}
-
-		data, _ := json.Marshal(ships)
-		client.Emit("sendShips", data)
+		s = s.CreateShip(ClientID)
+		data, _ := json.Marshal(s)
+		client.Emit("sendShip", data)
 	})
 
 	client.On("makeShot", func() {
@@ -65,13 +52,10 @@ func main() {
 	})
 
 	client.On("disconnection", func() {
+		isGame = false
 		log.Printf("Отключился от сервера\n")
 	})
 
-	//Make this work without stop
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		data, _, _ := reader.ReadLine()
-		fmt.Println(data)
+	for isGame == true {
 	}
 }
