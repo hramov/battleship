@@ -20,7 +20,7 @@ type Shot struct {
 	Y int
 }
 
-func (s *Ship) CreateShip(ClientID string) Ship {
+func (s Ship) CreateShip(ClientID string) Ship {
 	s.Player = ClientID
 	fmt.Printf("%s ", "Введите числовую позицию (1-10):")
 	fmt.Scanf("%d", &s.StartY)
@@ -33,7 +33,7 @@ func (s *Ship) CreateShip(ClientID string) Ship {
 	s.LivePoints = s.Length
 	s.Hit = false
 	s.Live = true
-	return *s
+	return s
 }
 
 func HitShip() Shot {
