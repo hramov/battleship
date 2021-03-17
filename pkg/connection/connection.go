@@ -2,8 +2,12 @@ package connection
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"net"
+	"sync"
+
+	"github.com/hramov/battleship/pkg/utils"
 )
 
 type Socket struct {
@@ -11,15 +15,15 @@ type Socket struct {
 	host_ip   string
 	host_port string
 	conn      net.Conn
+	from      chan string
+	to        chan string
 }
 
-func Execute(protocol, ip, port string) {
-	socket := Socket{protocol, ip, port, nil}
+func Execute(protocol, ip, port string, handler func(s *Socket)) {
+	socket := Socket{protocol, ip, port, nil, make(chan string, 10), make(chan string, 10)}
 	conn := socket.ConnectToServer()
 	socket.conn = conn
-	for {
-		socket.MaintainConnection()
-	}
+	socket.maintainConnections(handler)
 }
 
 func (s *Socket) ConnectToServer() net.Conn {
@@ -30,42 +34,43 @@ func (s *Socket) ConnectToServer() net.Conn {
 	return conn
 }
 
-func (s *Socket) On(rawEvent string, callback func(data string)) {
-	rawData, _ := bufio.NewReader(s.conn).ReadString('\n')
-	event, data := split(rawData, ":")
-
-	if event == rawEvent {
-		callback(data)
+func (s *Socket) listen() {
+	rawData, err := bufio.NewReader(s.conn).ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
 	}
+	s.from <- rawData
+}
+
+func (s *Socket) On(rawEvent string, callback func(data string)) {
+
+	rawData := <-s.from
+	fmt.Println(rawData)
+	event, data := utils.Split(rawData, ":")
+	if event == rawEvent {
+		callback(string(data))
+	}
+}
+
+func (s *Socket) speak() {
+	event, data := utils.Split(<-s.to, ":")
+	s.conn.Write([]byte(string(event) + ":" + string(data) + "\n"))
 }
 
 func (s *Socket) Emit(event string, data string) {
-	s.conn.Write([]byte(event + ":" + data + "\n"))
+	s.to <- event + ":" + data
 }
 
-func (s *Socket) MaintainConnection() {
-	s.On("whoami", func(data string) {
-		s.Emit("sendName", "Battleship")
-	})
-}
+func (s *Socket) maintainConnections(handler func(s *Socket)) {
+	wg := sync.WaitGroup{}
+	wg.Add(4)
 
-func split(message string, delim string) (string, string) {
-	var breakPosition int = 0
-	var charArray []string
-	var eventString, dataString string
-	for i, char := range message {
-		charArray = append(charArray, string(char))
-		if string(char) == delim {
-			breakPosition = i
-		}
-	}
-	event := charArray[:breakPosition]
-	data := charArray[breakPosition+1:]
-	for i := 0; i < len(event); i++ {
-		eventString += string(event[i])
-	}
-	for i := 0; i < len(data); i++ {
-		dataString += string(data[i])
-	}
-	return eventString, dataString
+	go func() {
+		go s.listen()
+		go s.speak()
+	}()
+
+	go handler(s)
+
+	wg.Wait()
 }
