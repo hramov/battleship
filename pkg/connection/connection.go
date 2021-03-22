@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"sync"
 
 	"github.com/hramov/battleship/pkg/utils"
 )
@@ -35,42 +34,38 @@ func (s *Socket) ConnectToServer() net.Conn {
 }
 
 func (s *Socket) listen() {
-	rawData, err := bufio.NewReader(s.conn).ReadString('\n')
-	if err != nil {
-		log.Fatal(err)
+	for {
+		rawData, err := bufio.NewReader(s.conn).ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+		s.from <- rawData
 	}
-	s.from <- rawData
 }
 
 func (s *Socket) On(rawEvent string, callback func(data string)) {
 
 	rawData := <-s.from
-	fmt.Println(rawData)
-	event, data := utils.Split(rawData, ":")
+	event, data := utils.Split(rawData, "|")
+	fmt.Print()
 	if event == rawEvent {
 		callback(string(data))
 	}
 }
 
 func (s *Socket) speak() {
-	event, data := utils.Split(<-s.to, ":")
-	s.conn.Write([]byte(string(event) + ":" + string(data) + "\n"))
+	for {
+		event, data := utils.Split(<-s.to, "|")
+		s.conn.Write([]byte(string(event) + "|" + string(data) + "\n"))
+	}
 }
 
 func (s *Socket) Emit(event string, data string) {
-	s.to <- event + ":" + data
+	s.to <- event + "|" + data
 }
 
 func (s *Socket) maintainConnections(handler func(s *Socket)) {
-	wg := sync.WaitGroup{}
-	wg.Add(4)
-
-	go func() {
-		go s.listen()
-		go s.speak()
-	}()
-
+	go s.speak()
 	go handler(s)
-
-	wg.Wait()
+	s.listen()
 }

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,8 +23,8 @@ type Client struct {
 	ShotField Field
 }
 
-func (c *Client) DrawField() {
-
+func (c *Client) DrawField(data string) {
+	json.Unmarshal([]byte(data), &c)
 	fmt.Printf(LETTER_STRING)
 	for i := 1; i < FIELD_HEIGHT-1; i++ {
 
