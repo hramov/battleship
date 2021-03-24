@@ -2,9 +2,9 @@ package connection
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"github.com/hramov/battleship/pkg/utils"
 )
@@ -18,11 +18,12 @@ type Socket struct {
 	to        chan string
 }
 
-func Execute(protocol, ip, port string, handler func(s *Socket)) {
-	socket := Socket{protocol, ip, port, nil, make(chan string, 10), make(chan string, 10)}
+func Execute(protocol, ip, port string) *Socket {
+	socket := Socket{protocol, ip, port, nil, make(chan string), make(chan string)}
 	conn := socket.ConnectToServer()
 	socket.conn = conn
-	socket.maintainConnections(handler)
+	socket.maintainConnections()
+	return &socket
 }
 
 func (s *Socket) ConnectToServer() net.Conn {
@@ -43,14 +44,30 @@ func (s *Socket) listen() {
 	}
 }
 
-func (s *Socket) On(rawEvent string, callback func(data string)) {
+func (s *Socket) On(handlers *map[string]func(data string)) {
 
-	rawData := <-s.from
-	event, data := utils.Split(rawData, "|")
-	fmt.Print()
-	if event == rawEvent {
-		callback(string(data))
+	for {
+		time.Sleep(time.Second / 1000)
+		rawData := <-s.from
+		rawEvent, data := utils.Split(rawData, "|")
+		for event, handler := range *handlers {
+			if event == rawEvent {
+				handler(data)
+			}
+		}
 	}
+
+	// time.Sleep(time.Second / 100)
+
+	// rawData := <-s.from
+	// event, data := utils.Split(rawData, "|")
+
+	// utils.Log("RAW_EVENT: " + rawEvent)
+	// utils.Log("ON: " + event)
+
+	// if event == rawEvent {
+	// 	callback(string(data))
+	// }
 }
 
 func (s *Socket) speak() {
@@ -61,11 +78,12 @@ func (s *Socket) speak() {
 }
 
 func (s *Socket) Emit(event string, data string) {
+	time.Sleep(time.Second / 1000)
+	utils.Log("EMIT: " + event)
 	s.to <- event + "|" + data
 }
 
-func (s *Socket) maintainConnections(handler func(s *Socket)) {
+func (s *Socket) maintainConnections() {
 	go s.speak()
-	go handler(s)
-	s.listen()
+	go s.listen()
 }

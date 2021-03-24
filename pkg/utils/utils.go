@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"fmt"
+	"time"
+)
+
 func Split(message string, delim string) (string, string) {
 	var breakPosition int = 0
 	var charArray []string
@@ -56,4 +61,9 @@ func Parser(x int) string {
 		break
 	}
 	return a
+}
+
+func Log(message string) {
+	data := time.Now().Format("02-01-2006 15:04:05")
+	fmt.Printf("%s | %s\n", data, message)
 }
