@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
-	b "github.com/hramov/battleship/pkg/battlefield"
+	battlefield "github.com/hramov/battleship/pkg/battlefield"
 	connection "github.com/hramov/battleship/pkg/connection"
 	"github.com/hramov/battleship/pkg/ship"
 	"github.com/hramov/battleship/pkg/utils"
@@ -12,7 +13,9 @@ import (
 
 func main() {
 
-	client := b.Client{}
+	c := connection.Client{}
+	b := battlefield.BattleField{}
+
 	s := connection.Execute("tcp", "127.0.0.1", "5000")
 
 	handlers := make(map[string]func(data string))
@@ -22,21 +25,21 @@ func main() {
 	}
 
 	handlers["whoami"] = func(data string) {
-		client.ID = data
+		c.ID, _ = strconv.Atoi(data)
 		s.Emit("sendName", "BattleShip")
 	}
 
 	handlers["enemy"] = func(data string) {
-		client.EnemyID = data
+		c.EnemyID, _ = strconv.Atoi(data)
 	}
 
 	handlers["drawField"] = func(data string) {
-		client.CreateField()
-		client.DrawField()
+		b.CreateField()
+		json.Unmarshal([]byte(data), &b)
+		b.DrawField()
 	}
 
 	handlers["placeShip"] = func(_ string) {
-		utils.Log("PLACE SHIP")
 		sh := ship.Ship{}
 		sh.CreateShip()
 		data, err := json.Marshal(sh)
@@ -44,6 +47,14 @@ func main() {
 			fmt.Println(err)
 		}
 		s.Emit("sendShip", string(data))
+	}
+
+	handlers["wrongShip"] = func(data string) {
+		utils.Log(data)
+	}
+
+	handlers["rightShip"] = func(data string) {
+		utils.Log(data)
 	}
 
 	s.On(&handlers)

@@ -11,38 +11,31 @@ const LETTER_STRING = "   А Б В Г Д Е Ж З И К\t\t   А Б В Г Д Е 
 type Field [FIELD_WIDTH][FIELD_HEIGHT]string
 
 type BattleField struct {
-	MyField    Field
-	EnemyField Field
-}
-
-type Client struct {
-	ID        string
-	EnemyID   string
 	Field     Field
 	ShotField Field
 }
 
-func (c *Client) CreateField() {
+func (b *BattleField) CreateField() {
 
 	for i := 0; i < FIELD_HEIGHT; i++ {
 		for j := 0; j < FIELD_WIDTH; j++ {
 			if i == 0 || i == FIELD_HEIGHT-1 {
-				c.Field[i][j] = "*"
-				c.ShotField[i][j] = "*"
+				b.Field[i][j] = "*"
+				b.ShotField[i][j] = "*"
 				continue
 			}
 			if j == 0 || j == FIELD_WIDTH-1 {
-				c.Field[i][j] = "*"
-				c.ShotField[i][j] = "*"
+				b.Field[i][j] = "*"
+				b.ShotField[i][j] = "*"
 			} else {
-				c.Field[i][j] = "_"
-				c.ShotField[i][j] = "_"
+				b.Field[i][j] = "_"
+				b.ShotField[i][j] = "_"
 			}
 		}
 	}
 }
 
-func (c *Client) DrawField() {
+func (b *BattleField) DrawField() {
 	fmt.Printf(LETTER_STRING)
 	for i := 1; i < FIELD_HEIGHT-1; i++ {
 
@@ -54,9 +47,9 @@ func (c *Client) DrawField() {
 		}
 		for j := 1; j < FIELD_WIDTH-1; j++ {
 			if j != FIELD_WIDTH-2 {
-				fmt.Printf("|%s", c.Field[i][j])
+				fmt.Printf("|%s", b.Field[i][j])
 			} else {
-				fmt.Printf("|%s|", c.Field[i][j])
+				fmt.Printf("|%s|", b.Field[i][j])
 			}
 		}
 		fmt.Printf("\t\t")
@@ -69,9 +62,9 @@ func (c *Client) DrawField() {
 		}
 		for j := 1; j < FIELD_HEIGHT-1; j++ {
 			if j != FIELD_HEIGHT-2 {
-				fmt.Printf("|%s", c.ShotField[i][j])
+				fmt.Printf("|%s", b.ShotField[i][j])
 			} else {
-				fmt.Printf("|%s|", c.ShotField[i][j])
+				fmt.Printf("|%s|", b.ShotField[i][j])
 			}
 		}
 		fmt.Println()
