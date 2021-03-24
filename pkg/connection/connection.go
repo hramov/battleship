@@ -56,18 +56,6 @@ func (s *Socket) On(handlers *map[string]func(data string)) {
 			}
 		}
 	}
-
-	// time.Sleep(time.Second / 100)
-
-	// rawData := <-s.from
-	// event, data := utils.Split(rawData, "|")
-
-	// utils.Log("RAW_EVENT: " + rawEvent)
-	// utils.Log("ON: " + event)
-
-	// if event == rawEvent {
-	// 	callback(string(data))
-	// }
 }
 
 func (s *Socket) speak() {
