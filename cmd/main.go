@@ -28,7 +28,6 @@ func main() {
 	handlers["whoami"] = func(data string, client *connection.Client) {
 		newID, _ := strconv.Atoi(strings.TrimSuffix(data, "\n"))
 		(*client).ID = newID
-		s.Emit("sendName", "BattleShip")
 	}
 
 	handlers["enemy"] = func(data string, client *connection.Client) {
@@ -60,7 +59,12 @@ func main() {
 	}
 
 	handlers["makeShot"] = func(data string, client *connection.Client) {
-		if data == "true" {
+		turn, err := strconv.ParseBool(strings.TrimSuffix(data, "\n"))
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(turn)
+		if turn {
 			newShot := shot.Shot{}
 			newShot.MakeShot()
 			shotData, err := json.Marshal(newShot)
@@ -68,7 +72,7 @@ func main() {
 				utils.Log(err.Error())
 			}
 			s.Emit("shot", string(shotData))
-		} else if data == "false" {
+		} else {
 			fmt.Println("Ожидайте хода противника...")
 		}
 	}
