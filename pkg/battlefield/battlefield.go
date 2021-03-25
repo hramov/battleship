@@ -74,14 +74,9 @@ func (b *BattleField) DrawField() {
 	}
 }
 
-func (b *BattleField) DrawShot(data string) {
+func (b *BattleField) DrawShot(data string, dot string) {
 	newShot := shot.Shot{}
 	json.Unmarshal([]byte(data), &newShot)
-
-	b.ShotField[newShot.X][newShot.Y] = "*"
+	b.ShotField[newShot.X][newShot.Y] = dot
 	b.DrawField()
-}
-
-func (b *BattleField) CheckHit() {
-
 }

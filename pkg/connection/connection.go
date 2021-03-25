@@ -53,7 +53,7 @@ func (s *Socket) listen() {
 	}
 }
 
-func (s *Socket) On(handlers *map[string]func(data string)) {
+func (s *Socket) On(handlers *map[string]func(data string, client *Client), client *Client) {
 
 	for {
 		time.Sleep(time.Second / socketDelay)
@@ -61,7 +61,7 @@ func (s *Socket) On(handlers *map[string]func(data string)) {
 		rawEvent, data := utils.Split(rawData, "|")
 		for event, handler := range *handlers {
 			if event == rawEvent {
-				handler(data)
+				handler(data, client)
 			}
 		}
 	}

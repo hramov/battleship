@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	battlefield "github.com/hramov/battleship/pkg/battlefield"
 	connection "github.com/hramov/battleship/pkg/connection"
@@ -14,33 +15,33 @@ import (
 
 func main() {
 
-	c := connection.Client{}
 	b := battlefield.BattleField{}
-
+	c := connection.Client{}
 	s := connection.Execute("tcp", "127.0.0.1", "5000")
 
-	handlers := make(map[string]func(data string))
+	handlers := make(map[string]func(data string, client *connection.Client))
 
-	handlers["connect"] = func(data string) {
+	handlers["connect"] = func(data string, client *connection.Client) {
 		fmt.Println("Connected!")
 	}
 
-	handlers["whoami"] = func(data string) {
-		c.ID, _ = strconv.Atoi(data)
+	handlers["whoami"] = func(data string, client *connection.Client) {
+		newID, _ := strconv.Atoi(strings.TrimSuffix(data, "\n"))
+		(*client).ID = newID
 		s.Emit("sendName", "BattleShip")
 	}
 
-	handlers["enemy"] = func(data string) {
-		c.EnemyID, _ = strconv.Atoi(data)
+	handlers["enemy"] = func(data string, client *connection.Client) {
+		(*client).EnemyID, _ = strconv.Atoi(strings.TrimSuffix(data, "\n"))
 	}
 
-	handlers["drawField"] = func(data string) {
+	handlers["drawField"] = func(data string, client *connection.Client) {
 		b.CreateField()
 		json.Unmarshal([]byte(data), &b)
 		b.DrawField()
 	}
 
-	handlers["placeShip"] = func(_ string) {
+	handlers["placeShip"] = func(_ string, client *connection.Client) {
 		sh := ship.Ship{}
 		sh.CreateShip()
 		data, err := json.Marshal(sh)
@@ -50,16 +51,16 @@ func main() {
 		s.Emit("sendShip", string(data))
 	}
 
-	handlers["wrongShip"] = func(data string) {
+	handlers["wrongShip"] = func(data string, client *connection.Client) {
 		utils.Log(data)
 	}
 
-	handlers["rightShip"] = func(data string) {
+	handlers["rightShip"] = func(data string, client *connection.Client) {
 		utils.Log(data)
 	}
 
-	handlers["makeShot"] = func(data string) {
-		if data == strconv.Itoa(c.ID) {
+	handlers["makeShot"] = func(data string, client *connection.Client) {
+		if data == "true" {
 			newShot := shot.Shot{}
 			newShot.MakeShot()
 			shotData, err := json.Marshal(newShot)
@@ -67,17 +68,22 @@ func main() {
 				utils.Log(err.Error())
 			}
 			s.Emit("shot", string(shotData))
+		} else if data == "false" {
+			fmt.Println("Ожидайте хода противника...")
 		}
 	}
 
-	handlers["wrongShot"] = func(data string) {
+	handlers["wrongShot"] = func(data string, client *connection.Client) {
 		utils.Log(data)
 	}
 
-	handlers["rightShot"] = func(data string) {
-		b.DrawShot(data)
+	handlers["hit"] = func(data string, client *connection.Client) {
+		b.DrawShot(data, "X")
 	}
 
-	s.On(&handlers)
+	handlers["missed"] = func(data string, client *connection.Client) {
+		b.DrawShot(data, "*")
+	}
 
+	s.On(&handlers, &c)
 }
