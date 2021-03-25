@@ -9,6 +9,10 @@ import (
 	"github.com/hramov/battleship/pkg/utils"
 )
 
+const (
+	socketDelay = 100
+)
+
 type Client struct {
 	ID      int
 	EnemyID int
@@ -52,7 +56,7 @@ func (s *Socket) listen() {
 func (s *Socket) On(handlers *map[string]func(data string)) {
 
 	for {
-		time.Sleep(time.Second / 100)
+		time.Sleep(time.Second / socketDelay)
 		rawData := <-s.from
 		rawEvent, data := utils.Split(rawData, "|")
 		for event, handler := range *handlers {
@@ -71,7 +75,7 @@ func (s *Socket) speak() {
 }
 
 func (s *Socket) Emit(event string, data string) {
-	time.Sleep(time.Second / 100)
+	time.Sleep(time.Second / socketDelay)
 	s.to <- event + "|" + data
 }
 

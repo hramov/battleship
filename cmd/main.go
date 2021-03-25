@@ -8,6 +8,7 @@ import (
 	battlefield "github.com/hramov/battleship/pkg/battlefield"
 	connection "github.com/hramov/battleship/pkg/connection"
 	"github.com/hramov/battleship/pkg/ship"
+	"github.com/hramov/battleship/pkg/shot"
 	"github.com/hramov/battleship/pkg/utils"
 )
 
@@ -55,6 +56,26 @@ func main() {
 
 	handlers["rightShip"] = func(data string) {
 		utils.Log(data)
+	}
+
+	handlers["makeShot"] = func(data string) {
+		if data == strconv.Itoa(c.ID) {
+			newShot := shot.Shot{}
+			newShot.MakeShot()
+			shotData, err := json.Marshal(newShot)
+			if err != nil {
+				utils.Log(err.Error())
+			}
+			s.Emit("shot", string(shotData))
+		}
+	}
+
+	handlers["wrongShot"] = func(data string) {
+		utils.Log(data)
+	}
+
+	handlers["rightShot"] = func(data string) {
+		b.DrawShot(data)
 	}
 
 	s.On(&handlers)

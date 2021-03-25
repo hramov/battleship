@@ -1,7 +1,10 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
+
+	"github.com/hramov/battleship/pkg/shot"
 )
 
 const FIELD_WIDTH = 12
@@ -69,4 +72,16 @@ func (b *BattleField) DrawField() {
 		}
 		fmt.Println()
 	}
+}
+
+func (b *BattleField) DrawShot(data string) {
+	newShot := shot.Shot{}
+	json.Unmarshal([]byte(data), &newShot)
+
+	b.ShotField[newShot.X][newShot.Y] = "*"
+	b.DrawField()
+}
+
+func (b *BattleField) CheckHit() {
+
 }

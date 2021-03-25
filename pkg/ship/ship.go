@@ -32,12 +32,3 @@ func (s *Ship) CreateShip() {
 	s.Hit = false
 	s.Live = true
 }
-
-func HitShip() Shot {
-	var shot Shot
-	fmt.Println("Введите координаты выстрела! Число:")
-	fmt.Scanf("%d", &shot.X)
-	fmt.Println("Введите координаты выстрела! Буква:")
-	fmt.Scanf("%d", &shot.Y)
-	return shot
-}
