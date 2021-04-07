@@ -40,6 +40,11 @@ func main() {
 		b.DrawField()
 	}
 
+	handlers["updateField"] = func(data string, client *connection.Client) {
+		utils.Log("Update")
+		b.UpdateField(data)
+	}
+
 	handlers["placeShip"] = func(_ string, client *connection.Client) {
 		sh := ship.Ship{}
 		sh.CreateShip()
@@ -63,7 +68,6 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(turn)
 		if turn {
 			newShot := shot.Shot{}
 			newShot.MakeShot()

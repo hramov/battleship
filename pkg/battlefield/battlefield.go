@@ -80,3 +80,8 @@ func (b *BattleField) DrawShot(data string, dot string) {
 	b.ShotField[newShot.X][newShot.Y] = dot
 	b.DrawField()
 }
+
+func (b *BattleField) UpdateField(data string) {
+	json.Unmarshal([]byte(data), &b)
+	b.DrawField()
+}
