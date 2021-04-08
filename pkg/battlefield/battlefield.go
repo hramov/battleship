@@ -85,3 +85,8 @@ func (b *BattleField) UpdateField(data string) {
 	json.Unmarshal([]byte(data), &b)
 	b.DrawField()
 }
+
+func (b *BattleField) Restart() {
+	fmt.Println("***********************GAMEOVER****************************")
+	b.CreateField()
+}

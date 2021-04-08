@@ -55,14 +55,6 @@ func main() {
 		s.Emit("sendShip", string(data))
 	}
 
-	handlers["wrongShip"] = func(data string, client *connection.Client) {
-		utils.Log(data)
-	}
-
-	handlers["rightShip"] = func(data string, client *connection.Client) {
-		utils.Log(data)
-	}
-
 	handlers["makeShot"] = func(data string, client *connection.Client) {
 		turn, err := strconv.ParseBool(strings.TrimSuffix(data, "\n"))
 		if err != nil {
@@ -81,16 +73,9 @@ func main() {
 		}
 	}
 
-	handlers["wrongShot"] = func(data string, client *connection.Client) {
-		utils.Log(data)
-	}
-
-	handlers["hit"] = func(data string, client *connection.Client) {
-		b.DrawShot(data, "X")
-	}
-
-	handlers["missed"] = func(data string, client *connection.Client) {
-		b.DrawShot(data, "*")
+	handlers["restart"] = func(data string, client *connection.Client) {
+		b = battlefield.BattleField{}
+		s.Emit("connect", strconv.Itoa((*client).ID))
 	}
 
 	s.On(&handlers, &c)
